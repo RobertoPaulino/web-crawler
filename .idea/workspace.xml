@@ -4,13 +4,9 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d330ac86-7f79-43bc-b3ac-f9d424536a95" name="Changes" comment="adds main and mod files">
-      <change afterPath="$PROJECT_DIR$/get_urls_from_html.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/get_urls_from_html_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/normalize_url.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="d330ac86-7f79-43bc-b3ac-f9d424536a95" name="Changes" comment="Creates normalize_url.go to normalize urls and get_urls_from_html.go to crawl trough HTML to obtain all the links, creates tests for each function.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -145,7 +141,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="initial commit" />
     <MESSAGE value="adds main and mod files" />
-    <option name="LAST_COMMIT_MESSAGE" value="adds main and mod files" />
+    <MESSAGE value="Creates normalize_url.go to normalize urls and get_urls_from_html.go to crawl trough HTML to obtain all the links, creates tests for each function." />
+    <option name="LAST_COMMIT_MESSAGE" value="Creates normalize_url.go to normalize urls and get_urls_from_html.go to crawl trough HTML to obtain all the links, creates tests for each function." />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
