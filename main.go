@@ -18,5 +18,6 @@ func main() {
 	}
 
 	fmt.Printf("starting crawl of: %s\n", args[0])
+	fmt.Println(getHTML(args[0]))
 	os.Exit(0)
 }

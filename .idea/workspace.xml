@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d330ac86-7f79-43bc-b3ac-f9d424536a95" name="Changes" comment="Creates normalize_url.go to normalize urls and get_urls_from_html.go to crawl trough HTML to obtain all the links, creates tests for each function.">
+    <list default="true" id="d330ac86-7f79-43bc-b3ac-f9d424536a95" name="Changes" comment="program now accepts argument http address and returns http body">
+      <change afterPath="$PROJECT_DIR$/get_html.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/get_html_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
@@ -70,6 +72,11 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;vcs.Git&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\rpaul\go\src\web-crawler" />
+    </key>
+  </component>
   <component name="RunManager" selected="Go Test.get_urls_from_html_test.go">
     <configuration name="go build get_urls_from_html.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="web-crawler" />
@@ -142,7 +149,9 @@
     <MESSAGE value="initial commit" />
     <MESSAGE value="adds main and mod files" />
     <MESSAGE value="Creates normalize_url.go to normalize urls and get_urls_from_html.go to crawl trough HTML to obtain all the links, creates tests for each function." />
-    <option name="LAST_COMMIT_MESSAGE" value="Creates normalize_url.go to normalize urls and get_urls_from_html.go to crawl trough HTML to obtain all the links, creates tests for each function." />
+    <MESSAGE value="Initial setup of main.go" />
+    <MESSAGE value="program now accepts argument http address and returns http body" />
+    <option name="LAST_COMMIT_MESSAGE" value="program now accepts argument http address and returns http body" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
