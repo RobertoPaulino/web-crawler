@@ -5,9 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d330ac86-7f79-43bc-b3ac-f9d424536a95" name="Changes" comment="program now accepts argument http address and returns http body">
-      <change afterPath="$PROJECT_DIR$/get_html.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/get_html_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/crawl_page.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/get_html.go" beforeDir="false" afterPath="$PROJECT_DIR$/get_html.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -38,6 +38,9 @@
     &quot;accountId&quot;: &quot;83a5da42-4a37-4b95-bba6-d8ba20a9d4e4&quot;
   }
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>

@@ -2,8 +2,10 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
 func getHTML(rawURL string) (string, error) {
@@ -18,14 +20,14 @@ func getHTML(rawURL string) (string, error) {
 		return "", errors.New(resp.Status)
 	}
 
-	if resp.Header.Get("Content-Type") == "text/html" {
-		return "", errors.New("not text/html")
+	contentType := resp.Header.Get("Content-Type")
+	if !strings.Contains(contentType, "text/html") {
+		return "", fmt.Errorf("got non-HTML response: %s", contentType)
 	}
+
 	content, err := io.ReadAll(resp.Body)
-	closingError := resp.Body.Close()
-	if closingError != nil {
-		return "", errors.New(closingError.Error())
-	}
+	resp.Body.Close()
+
 	if err != nil {
 		return "", err
 	}
