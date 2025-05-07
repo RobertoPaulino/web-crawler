@@ -3,7 +3,9 @@ package api
 import (
 	"encoding/csv"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
+	"path/filepath"
 	"strconv"
 
 	"github.com/RobertoPaulino/web-crawler/pkg/crawler"
@@ -50,7 +52,16 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "web/templates/index.html")
+	// Read the template file
+	content, err := ioutil.ReadFile(filepath.Join("web", "templates", "index.html"))
+	if err != nil {
+		http.Error(w, "Error reading template file: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Set content type
+	w.Header().Set("Content-Type", "text/html")
+	w.Write(content)
 }
 
 func handleCrawl(w http.ResponseWriter, r *http.Request) {

@@ -183,12 +183,12 @@
             </form>
         </div>
         <div class="spinner-container">
-            <div class="spinner"></div>
-            <p>Crawling in progress...</p>
-        </div>
+                <div class="spinner"></div>
+                <p>Crawling in progress...</p>
+            </div>
         <div id="results"></div>
-    </div>
-
+        </div>
+        
     <script>
         document.getElementById('crawlForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -274,7 +274,7 @@
                             <a href="/api/export-csv?url=${encodeURIComponent(data.baseURL)}&concurrency=${data.concurrency}&pages=${data.maxPages}" class="button">
                                 Export SEO Data as CSV
                             </a>
-                        </div>
+        </div>
                     `;
                 }
 
@@ -284,7 +284,7 @@
                 resultsDiv.innerHTML = `
                     <div class="error">
                         <p>Error: ${error.message}</p>
-                    </div>
+    </div>
                 `;
             } finally {
                 spinnerContainer.style.display = 'none';

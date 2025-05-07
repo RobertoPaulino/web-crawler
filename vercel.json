@@ -6,6 +6,10 @@
       "use": "@vercel/go"
     },
     {
+      "src": "web/templates/**",
+      "use": "@vercel/static"
+    },
+    {
       "src": "web/static/**",
       "use": "@vercel/static"
     }
@@ -14,6 +18,10 @@
     {
       "src": "/static/(.*)",
       "dest": "/web/static/$1"
+    },
+    {
+      "src": "/templates/(.*)",
+      "dest": "/web/templates/$1"
     },
     {
       "src": "/api/(.*)",
