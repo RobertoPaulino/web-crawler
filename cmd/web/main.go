@@ -307,23 +307,23 @@ const resultsHTML = `{{if .Error}}
             <p>No pages found.</p>
         </div>
     {{else}}
-        <div class="results-table-wrapper">
+        <div class="results-table-container">
             <table class="results-table">
                 <thead>
                     <tr>
-                        <th>URL</th>
-                        <th>Links</th>
-                        <th>Status</th>
-                        <th>Title</th>
+                        <th style="min-width:220px;max-width:340px;">URL</th>
+                        <th style="width:60px;">Links</th>
+                        <th style="width:70px;">Status</th>
+                        <th style="min-width:180px;max-width:340px;">Title</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {{range .Results}}
-                    <tr>
-                        <td style="word-break:break-all;max-width:320px;">{{.URL}}</td>
-                        <td>{{.Count}}</td>
-                        <td>{{.StatusCode}}</td>
-                        <td style="word-break:break-all;max-width:320px;">{{.Title}}</td>
+                    {{range $i, $row := .Results}}
+                    <tr class="{{if mod $i 2}}even{{else}}odd{{end}}">
+                        <td class="cell-url">{{$row.URL}}</td>
+                        <td>{{$row.Count}}</td>
+                        <td>{{$row.StatusCode}}</td>
+                        <td class="cell-title">{{$row.Title}}</td>
                     </tr>
                     {{end}}
                 </tbody>

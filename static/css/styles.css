@@ -130,20 +130,78 @@ button:hover, .button:hover {
     display: block;
 }
 
-.results table {
-    width: 100%;
-    border-collapse: collapse;
+.results-table-container {
+    background: rgba(255,255,255,0.95);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    padding: 1.5rem 1rem;
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
 }
 
-.results table th, .results table td {
-    padding: 0.5rem;
+.results-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 600px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 1rem;
+}
+
+.results-table th, .results-table td {
+    padding: 0.75rem 1rem;
     text-align: left;
+    vertical-align: top;
     border-bottom: 1px solid #e2e8f0;
 }
 
-.results table th {
-    font-weight: 600;
+.results-table th {
+    background: #f5f7fa;
     color: #2d3748;
+    font-weight: 600;
+    font-size: 1.05rem;
+    border-bottom: 2px solid #c3cfe2;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.results-table tr.even {
+    background: #f7fafc;
+}
+
+.results-table tr.odd {
+    background: #fff;
+}
+
+.cell-url, .cell-title {
+    max-width: 340px;
+    word-break: break-all;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+    .results-table, .results-table th, .results-table td {
+        font-size: 0.95rem;
+    }
+    .cell-url, .cell-title {
+        max-width: 180px;
+    }
+}
+
+@media (max-width: 600px) {
+    .results-table-container {
+        padding: 0.5rem 0.1rem;
+    }
+    .results-table th, .results-table td {
+        padding: 0.5rem 0.3rem;
+    }
+    .cell-url, .cell-title {
+        max-width: 100px;
+    }
 }
 
 .results td.good {
