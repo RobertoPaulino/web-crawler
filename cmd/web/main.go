@@ -307,13 +307,8 @@ const resultsHTML = `{{if .Error}}
             <p>No pages found.</p>
         </div>
     {{else}}
-        <div class="results-tabs">
-            <button class="tab-btn active" data-tab="basic">Basic</button>
-            <button class="tab-btn" data-tab="seo">SEO Details</button>
-        </div>
-
-        <div id="basic-tab" class="tab-content active">
-            <table>
+        <div class="results-table-wrapper">
+            <table class="results-table">
                 <thead>
                     <tr>
                         <th>URL</th>
@@ -325,86 +320,24 @@ const resultsHTML = `{{if .Error}}
                 <tbody>
                     {{range .Results}}
                     <tr>
-                        <td>{{.URL}}</td>
+                        <td style="word-break:break-all;max-width:320px;">{{.URL}}</td>
                         <td>{{.Count}}</td>
                         <td>{{.StatusCode}}</td>
-                        <td>{{.Title}}</td>
+                        <td style="word-break:break-all;max-width:320px;">{{.Title}}</td>
                     </tr>
                     {{end}}
                 </tbody>
             </table>
         </div>
-
-        <div id="seo-tab" class="tab-content">
-            <table>
-                <thead>
-                    <tr>
-                        <th>URL</th>
-                        <th>Words</th>
-                        <th>Int. Links</th>
-                        <th>Ext. Links</th>
-                        <th>Images</th>
-                        <th>H1</th>
-                        <th>Meta</th>
-                        <th>Canonical</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{range .Results}}
-                    <tr>
-                        <td>{{.URL}}</td>
-                        <td>{{.WordCount}}</td>
-                        <td>{{.InternalLinks}}</td>
-                        <td>{{.ExternalLinks}}</td>
-                        <td>{{.ImagesCount}}</td>
-                        <td class="{{if .HasH1}}good{{else}}bad{{end}}">{{.H1Count}}</td>
-                        <td class="{{if .HasMeta}}good{{else}}bad{{end}}">{{if .HasMeta}}Yes{{else}}No{{end}}</td>
-                        <td class="{{if .HasCanonical}}good{{else}}bad{{end}}">
-                            {{if .HasCanonical}}
-                                <span title="{{.CanonicalURL}}">Yes</span>
-                            {{else}}
-                                No
-                            {{end}}
-                        </td>
-                    </tr>
-                    {{end}}
-                </tbody>
-            </table>
+        <div class="seo-note">
+            <p>For full SEO data (including meta tags, word count, H1s, and more), <strong>download the CSV</strong> below.</p>
         </div>
-        
         <div class="actions">
             <a href="/export-csv?url={{.BaseURL}}&concurrency={{.Concurrency}}&pages={{.MaxPages}}" class="button">
                 Export SEO Data as CSV
             </a>
         </div>
     {{end}}
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const tabBtns = document.querySelectorAll('.tab-btn');
-            const tabContents = document.querySelectorAll('.tab-content');
-            
-            tabBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const tabId = btn.getAttribute('data-tab');
-                    
-                    // Hide all content
-                    tabContents.forEach(content => {
-                        content.classList.remove('active');
-                    });
-                    
-                    // Remove active class from all buttons
-                    tabBtns.forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-                    
-                    // Show selected content and mark button as active
-                    document.getElementById(tabId + '-tab').classList.add('active');
-                    btn.classList.add('active');
-                });
-            });
-        });
-    </script>
 {{end}}`
 
 const downloadHTML = `<!DOCTYPE html>

@@ -1,137 +1,53 @@
-# Web Crawler
+# Web Crawler (Vercel Deployment Branch)
 
-A concurrent web crawler written in Go that traverses websites, extracts links, and provides a report of all internal links found.
+This branch is optimized for deployment on [Vercel](https://vercel.com). It contains only the files and configuration needed to run the web crawler as a serverless Go function with a modern web interface.
 
 ## Features
 
-- Concurrent crawling with configurable concurrency limits
-- Stays within the domain of the starting URL
-- Configurable maximum number of pages to crawl
-- Provides a detailed report with the count of internal links to each page
-- Web interface with HTMX for interactive crawling
-- Export results to CSV file
-- **SEO Analysis**: Extracts and reports on key SEO metrics including:
-  - Page titles and meta descriptions
-  - H1 tags and content length
-  - Internal and external link counts
-  - Status codes and canonical URLs
-  - Image counts and more
+- Deployable instantly to Vercel as a serverless Go function
+- Interactive web interface for crawling and SEO research
+- Downloadable CSV with detailed SEO data for each crawled page
+- Clean, modern UI
+
+## Usage
+
+1. **Deploy to Vercel**
+   - Clone this repository or connect it to your Vercel account.
+   - Deploy directly from the Vercel dashboard or using the CLI:
+     ```bash
+     vercel --prod
+     ```
+   - No build steps or shell scripts are required.
+
+2. **Using the Web Crawler**
+   - Visit your deployed Vercel URL.
+   - Enter the URL you want to crawl, set concurrency and max pages if desired, and start crawling.
+   - Results will appear in a clean table.
+   - For full SEO data, click **Export SEO Data as CSV** to download a spreadsheet with all metrics.
 
 ## Project Structure
 
 ```
 web-crawler/
 ├── cmd/
-│   ├── crawler/         # CLI application entry point
-│   └── web/             # Web server entry point
+│   └── web/             # Vercel Go serverless function (entry point)
 ├── pkg/
 │   └── crawler/         # Core crawler functionality
 ├── internal/
 │   └── utils/           # Internal utility functions
-├── web/
-│   ├── templates/       # HTML templates
-│   └── static/          # Static assets (CSS, downloads)
-├── Makefile             # Build and run commands
+├── static/
+│   └── css/             # Static CSS assets
+├── vercel.json          # Vercel deployment configuration
 ├── go.mod               # Go module definition
-└── README.md            # Project documentation
+└── README.md            # This file
 ```
 
-## Installation
+## Notes
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/RobertoPaulino/web-crawler.git
-   cd web-crawler
-   ```
-
-2. Build the project:
-   ```bash
-   make build
-   ```
-
-## Usage
-
-### Command Line Interface
-
-Run the crawler with the following command:
-
-```bash
-make run ARGS="<baseURL> <maxConcurrency> <maxPages>"
-```
-
-Example:
-```bash
-make run ARGS="https://example.com 10 100"
-```
-
-Or run directly:
-```bash
-./bin/crawler https://example.com 10 100"
-```
-
-#### Parameters
-
-- `baseURL`: The starting URL for the crawler
-- `maxConcurrency`: Maximum number of concurrent HTTP requests
-- `maxPages`: Maximum number of pages to crawl
-
-### Web Interface
-
-Start the web server with:
-
-```bash
-make web
-```
-
-Then open your browser and navigate to:
-
-```
-http://localhost:8080
-```
-
-The web interface provides:
-- A sleek, modern UI with gradient background
-- Form to enter crawl parameters
-- Interactive results display with SEO metrics
-- Tabbed interface to view basic and detailed SEO data
-- Option to export results as CSV with comprehensive SEO data
-
-## SEO Analysis
-
-The crawler collects the following SEO metrics for each page:
-
-| Metric | Description |
-|--------|-------------|
-| Status Code | HTTP response code (200, 404, etc.) |
-| Title | Page title from `<title>` tag |
-| Meta Description | Content from meta description |
-| Word Count | Total words on the page |
-| Internal Links | Count of links pointing to the same domain |
-| External Links | Count of links pointing to external domains |
-| Images | Number of images on the page |
-| H1 Tags | Number of H1 headings |
-| Canonical URL | Self-referencing canonical URL if present |
-
-These metrics are crucial for SEO analysis and can help identify:
-- Missing title tags or meta descriptions
-- Pages with duplicate content issues
-- Pages with thin content
-- Proper internal linking structure
-- Crawlability issues
-
-## Development
-
-### Running Tests
-
-```bash
-make test
-```
-
-### Clean Build Artifacts
-
-```bash
-make clean
-```
+- This branch is for deployment only. For development, use the main branch.
+- All shell scripts and Makefiles have been removed for a clean, serverless deployment.
+- The crawler runs in a serverless environment, so each crawl is stateless and limited by Vercel's function execution time.
+- For advanced SEO analysis, always use the CSV export feature.
 
 ## License
 
