@@ -14,8 +14,9 @@ body {
 }
 
 .container {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
+    padding: 0 1rem;
 }
 
 h1 {
@@ -96,19 +97,20 @@ button:hover, .button:hover {
 
 .results-tabs {
     display: flex;
-    margin-bottom: 1rem;
-    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #e2e8f0;
+    gap: 1rem;
 }
 
 .tab-btn {
     background: transparent;
     color: #4a5568;
-    padding: 0.5rem 1rem;
-    margin-right: 0.5rem;
+    padding: 0.75rem 1.5rem;
     border-radius: 4px 4px 0 0;
     font-weight: 500;
     border-bottom: 2px solid transparent;
     width: auto;
+    margin-bottom: -2px;
 }
 
 .tab-btn:hover {
@@ -124,6 +126,10 @@ button:hover, .button:hover {
 
 .tab-content {
     display: none;
+    background: white;
+    border-radius: 0 8px 8px 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .tab-content.active {
@@ -133,10 +139,15 @@ button:hover, .button:hover {
 .results table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 1rem;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .results table th, .results table td {
-    padding: 0.5rem;
+    padding: 1rem;
     text-align: left;
     border-bottom: 1px solid #e2e8f0;
 }
@@ -144,6 +155,16 @@ button:hover, .button:hover {
 .results table th {
     font-weight: 600;
     color: #2d3748;
+    background: #f7fafc;
+    white-space: nowrap;
+}
+
+.results table tr:last-child td {
+    border-bottom: none;
+}
+
+.results table tr:hover td {
+    background: #f7fafc;
 }
 
 .results td.good {
@@ -163,14 +184,14 @@ button:hover, .button:hover {
 }
 
 .actions {
-    margin-top: 1rem;
+    margin-top: 1.5rem;
     display: flex;
     justify-content: flex-end;
 }
 
 .actions button, .actions .button {
     width: auto;
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1.5rem;
     margin-left: 0.5rem;
 }
 
@@ -201,7 +222,7 @@ button:hover, .button:hover {
 }
 
 .crawl-info {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid #e2e8f0;
 }
@@ -254,5 +275,9 @@ button:hover, .button:hover {
     .results table {
         display: block;
         overflow-x: auto;
+    }
+
+    .tab-btn {
+        padding: 0.5rem 1rem;
     }
 } 

@@ -3,6 +3,8 @@
 build:
 	go build -o bin/crawler ./cmd/crawler
 	go build -o bin/web ./cmd/web
+	chmod +x bin/crawler
+	chmod +x bin/web
 
 test:
 	go test -v ./...
