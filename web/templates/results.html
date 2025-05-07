@@ -1,0 +1,116 @@
+{{if .Error}}
+    <div class="error">
+        <p>Error: {{.Error}}</p>
+    </div>
+{{else}}
+    <div class="crawl-info">
+        <h2>Crawl Results for {{.BaseURL}}</h2>
+        <p class="page-count">Found {{.PageCount}} unique pages</p>
+    </div>
+    
+    {{if eq .PageCount 0}}
+        <div class="empty-results">
+            <p>No pages found.</p>
+        </div>
+    {{else}}
+        <div class="results-tabs">
+            <button class="tab-btn active" data-tab="basic">Basic</button>
+            <button class="tab-btn" data-tab="seo">SEO Details</button>
+        </div>
+
+        <div id="basic-tab" class="tab-content active">
+            <table>
+                <thead>
+                    <tr>
+                        <th>URL</th>
+                        <th>Links</th>
+                        <th>Status</th>
+                        <th>Title</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Results}}
+                    <tr>
+                        <td>{{.URL}}</td>
+                        <td>{{.Count}}</td>
+                        <td>{{.StatusCode}}</td>
+                        <td>{{.Title}}</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="seo-tab" class="tab-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>URL</th>
+                        <th>Words</th>
+                        <th>Int. Links</th>
+                        <th>Ext. Links</th>
+                        <th>Images</th>
+                        <th>H1</th>
+                        <th>Meta</th>
+                        <th>Canonical</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Results}}
+                    <tr>
+                        <td>{{.URL}}</td>
+                        <td>{{.WordCount}}</td>
+                        <td>{{.InternalLinks}}</td>
+                        <td>{{.ExternalLinks}}</td>
+                        <td>{{.ImagesCount}}</td>
+                        <td class="{{if .HasH1}}good{{else}}bad{{end}}">{{.H1Count}}</td>
+                        <td class="{{if .HasMeta}}good{{else}}bad{{end}}">{{if .HasMeta}}Yes{{else}}No{{end}}</td>
+                        <td class="{{if .HasCanonical}}good{{else}}bad{{end}}">
+                            {{if .HasCanonical}}
+                                <span title="{{.CanonicalURL}}">Yes</span>
+                            {{else}}
+                                No
+                            {{end}}
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="actions">
+            <button hx-get="/export-csv?url={{.BaseURL}}&concurrency={{.Concurrency}}&pages={{.MaxPages}}" 
+                    hx-target="#download-placeholder">
+                Export SEO Data as CSV
+            </button>
+        </div>
+        <div id="download-placeholder"></div>
+    {{end}}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.getAttribute('data-tab');
+                    
+                    // Hide all content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Remove active class from all buttons
+                    tabBtns.forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Show selected content and mark button as active
+                    document.getElementById(tabId + '-tab').classList.add('active');
+                    btn.classList.add('active');
+                });
+            });
+        });
+    </script>
+{{end}} 

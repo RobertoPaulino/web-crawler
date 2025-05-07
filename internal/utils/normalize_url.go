@@ -1,13 +1,12 @@
-package main
+package utils
 
 import (
 	"errors"
 	"net/url"
 )
 
-func normalizeURL(u string) (string, error) {
+func NormalizeURL(u string) (string, error) {
 	parsedURL, err := url.Parse(u)
-	print(parsedURL)
 	if u == "" {
 		return "", errors.New("normalizeURL: URL is empty")
 	}

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+
+	"github.com/RobertoPaulino/web-crawler/pkg/crawler"
 )
 
 func main() {
@@ -22,26 +24,26 @@ func main() {
 
 	maxConcurrency, err := strconv.Atoi(maxConcurrencyString)
 	if err != nil {
-		fmt.Printf("Error - maxConcurrency: %v", err)
+		fmt.Printf("Error - maxConcurrency: %v\n", err)
 		return
 	}
 	maxPages, err := strconv.Atoi(maxPagesString)
 	if err != nil {
-		fmt.Printf("Error - maxPages: %v", err)
+		fmt.Printf("Error - maxPages: %v\n", err)
 		return
 	}
 
-	cfg, err := configure(rawBaseURL, maxConcurrency, maxPages)
+	cfg, err := crawler.NewConfig(rawBaseURL, maxConcurrency, maxPages)
 	if err != nil {
-		fmt.Printf("Error - configure: %v", err)
+		fmt.Printf("Error - configure: %v\n", err)
 		return
 	}
 
 	fmt.Printf("starting crawl of: %s...\n", rawBaseURL)
 
-	cfg.wg.Add(1)
-	go cfg.crawlPage(rawBaseURL)
-	cfg.wg.Wait()
+	cfg.Wg.Add(1)
+	go cfg.CrawlPage(rawBaseURL)
+	cfg.Wg.Wait()
 
-	printReport(cfg.pages, rawBaseURL)
+	crawler.PrintReport(cfg.Pages, rawBaseURL)
 }

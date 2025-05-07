@@ -1,5 +1,5 @@
 module github.com/RobertoPaulino/web-crawler
 
-go 1.23.0
+go 1.24.2
 
-require golang.org/x/net v0.28.0 // indirect
+require golang.org/x/net v0.40.0 // indirect

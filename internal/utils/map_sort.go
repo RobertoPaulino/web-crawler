@@ -1,15 +1,12 @@
-package main
+package utils
 
 import (
 	"fmt"
 	"sort"
 )
 
-func mapSort(pages map[string]int) []string {
-
+func MapSort(pages map[string]int) []string {
 	keys := make([]string, 0, len(pages))
-
-	res := make([]string, len(pages))
 
 	for key := range pages {
 		keys = append(keys, key)
@@ -19,6 +16,7 @@ func mapSort(pages map[string]int) []string {
 		return pages[keys[i]] > pages[keys[j]]
 	})
 
+	var res []string
 	for _, k := range keys {
 		if pages[k] > 0 {
 			res = append(res, fmt.Sprintf("Found %v internal links to %v \n", pages[k], k))
