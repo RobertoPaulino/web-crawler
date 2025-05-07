@@ -2,34 +2,22 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/**/*.go",
+      "src": "cmd/web/main.go",
       "use": "@vercel/go"
     },
     {
-      "src": "web/templates/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "web/static/**",
+      "src": "static/**",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/static/(.*)",
-      "dest": "/web/static/$1"
-    },
-    {
-      "src": "/templates/(.*)",
-      "dest": "/web/templates/$1"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "dest": "/static/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/api/index.go"
+      "dest": "cmd/web/main.go"
     }
   ]
 } 

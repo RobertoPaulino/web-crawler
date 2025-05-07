@@ -3,8 +3,6 @@
 build:
 	go build -o bin/crawler ./cmd/crawler
 	go build -o bin/web ./cmd/web
-	chmod +x bin/crawler
-	chmod +x bin/web
 
 test:
 	go test -v ./...
@@ -19,5 +17,5 @@ clean:
 	rm -rf bin/
 
 # Example usage:
-# make run ARGS="https://example.com 10 100"
+# make run ARGS="https://example.com 10 100" 
 # make web (to start the web interface on port 8080) 
