@@ -318,12 +318,12 @@ const resultsHTML = `{{if .Error}}
                     </tr>
                 </thead>
                 <tbody>
-                    {{range $i, $row := .Results}}
-                    <tr class="{{if mod $i 2}}even{{else}}odd{{end}}">
-                        <td class="cell-url">{{$row.URL}}</td>
-                        <td>{{$row.Count}}</td>
-                        <td>{{$row.StatusCode}}</td>
-                        <td class="cell-title">{{$row.Title}}</td>
+                    {{range .Results}}
+                    <tr>
+                        <td class="cell-url">{{.URL}}</td>
+                        <td>{{.Count}}</td>
+                        <td>{{.StatusCode}}</td>
+                        <td class="cell-title">{{.Title}}</td>
                     </tr>
                     {{end}}
                 </tbody>

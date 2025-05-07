@@ -168,11 +168,11 @@ button:hover, .button:hover {
     z-index: 1;
 }
 
-.results-table tr.even {
+.results-table tr:nth-child(even) {
     background: #f7fafc;
 }
 
-.results-table tr.odd {
+.results-table tr:nth-child(odd) {
     background: #fff;
 }
 
