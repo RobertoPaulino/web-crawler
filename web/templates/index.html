@@ -4,43 +4,292 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Crawler</title>
-    <!-- HTMX -->
-    <script src="https://unpkg.com/htmx.org@1.9.3"></script>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #2c3e50;
+            --background-color: #f5f7fa;
+            --text-color: #2c3e50;
+            --border-color: #e1e8ed;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+
+        .crawler-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background: #357abd;
+        }
+
+        .spinner-container {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .spinner-container.htmx-request {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .crawl-info {
+            margin-bottom: 1.5rem;
+        }
+
+        .page-count {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--background-color);
+            font-weight: 600;
+        }
+
+        .actions {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        .button {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .button:hover {
+            background: #357abd;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>Web Crawler</h1>
-        
         <div class="crawler-form">
-            <form hx-post="/crawl" hx-target="#results" hx-indicator="#spinner">
+            <form id="crawlForm">
                 <div class="form-group">
-                    <input type="url" name="url" id="url" placeholder="Enter URL to crawl..." required>
+                    <input type="url" name="url" placeholder="Enter URL to crawl" required>
                 </div>
                 <div class="form-group controls">
                     <div>
-                        <label for="concurrency">Max Concurrency:</label>
-                        <input type="number" name="concurrency" id="concurrency" min="1" max="20" value="5">
+                        <input type="number" name="concurrency" placeholder="Concurrency (default: 5)" min="1" max="20">
                     </div>
                     <div>
-                        <label for="pages">Max Pages:</label>
-                        <input type="number" name="pages" id="pages" min="1" max="1000" value="50">
+                        <input type="number" name="pages" placeholder="Max Pages (default: 50)" min="1" max="1000">
                     </div>
                 </div>
-                <button type="submit">Crawl</button>
+                <button type="submit">Start Crawling</button>
             </form>
         </div>
-        
         <div class="spinner-container">
-            <div id="spinner" class="htmx-indicator">
-                <div class="spinner"></div>
-                <p>Crawling in progress...</p>
-            </div>
+            <div class="spinner"></div>
+            <p>Crawling in progress...</p>
         </div>
-        
-        <div id="results" class="results">
-            <!-- Results will appear here -->
-        </div>
+        <div id="results"></div>
     </div>
+
+    <script>
+        document.getElementById('crawlForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const resultsDiv = document.getElementById('results');
+            const spinnerContainer = document.querySelector('.spinner-container');
+
+            // Show spinner
+            spinnerContainer.style.display = 'block';
+            resultsDiv.innerHTML = '';
+
+            try {
+                const response = await fetch('/api/crawl', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        url: form.url.value,
+                        concurrency: parseInt(form.concurrency.value) || 5,
+                        maxPages: parseInt(form.pages.value) || 50
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    resultsDiv.innerHTML = `
+                        <div class="error">
+                            <p>Error: ${data.error}</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Create results HTML
+                let resultsHTML = `
+                    <div class="results">
+                        <div class="crawl-info">
+                            <h2>Crawl Results for ${data.baseURL}</h2>
+                            <p class="page-count">Found ${data.pageCount} unique pages</p>
+                        </div>
+                `;
+
+                if (data.pageCount === 0) {
+                    resultsHTML += `
+                        <div class="empty-results">
+                            <p>No pages found.</p>
+                        </div>
+                    `;
+                } else {
+                    resultsHTML += `
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>URL</th>
+                                    <th>Links</th>
+                                    <th>Status</th>
+                                    <th>Title</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    data.results.forEach(result => {
+                        resultsHTML += `
+                            <tr>
+                                <td>${result.URL}</td>
+                                <td>${result.Count}</td>
+                                <td>${result.StatusCode}</td>
+                                <td>${result.Title}</td>
+                            </tr>
+                        `;
+                    });
+
+                    resultsHTML += `
+                            </tbody>
+                        </table>
+                        <div style="margin-top:1rem; color:#718096; font-size:0.95rem;">
+                            For more detailed SEO data, please use the <b>Export SEO Data as CSV</b> button below.
+                        </div>
+                        <div class="actions">
+                            <a href="/api/export-csv?url=${encodeURIComponent(data.baseURL)}&concurrency=${data.concurrency}&pages=${data.maxPages}" class="button">
+                                Export SEO Data as CSV
+                            </a>
+                        </div>
+                    `;
+                }
+
+                resultsHTML += '</div>';
+                resultsDiv.innerHTML = resultsHTML;
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="error">
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            } finally {
+                spinnerContainer.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html> 
