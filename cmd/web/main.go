@@ -4,11 +4,9 @@ import (
 	"encoding/csv"
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
-	"sort"
 	"strconv"
 	"time"
 
@@ -48,28 +46,29 @@ type DownloadData struct {
 	URL string
 }
 
-func main() {
+// Handler is the main HTTP handler for the application
+func Handler(w http.ResponseWriter, r *http.Request) {
 	// Set up templates
 	templates := template.Must(template.ParseGlob("web/templates/*.html"))
 
 	// Serve static files
-	fs := http.FileServer(http.Dir("web/static"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
+	if r.URL.Path == "/static/" {
+		fs := http.FileServer(http.Dir("web/static"))
+		fs.ServeHTTP(w, r)
+		return
+	}
 
 	// Home page
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" {
-			http.NotFound(w, r)
-			return
-		}
+	if r.URL.Path == "/" {
 		err := templates.ExecuteTemplate(w, "index.html", nil)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-	})
+		return
+	}
 
 	// Handle crawl
-	http.HandleFunc("/crawl", func(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/crawl" {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
@@ -113,10 +112,11 @@ func main() {
 			PageCount:   len(cfg.Pages),
 			Results:     results,
 		})
-	})
+		return
+	}
 
 	// Export CSV
-	http.HandleFunc("/export-csv", func(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/export-csv" {
 		url := r.URL.Query().Get("url")
 		concurrencyStr := r.URL.Query().Get("concurrency")
 		pagesStr := r.URL.Query().Get("pages")
@@ -218,12 +218,11 @@ func main() {
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-	})
+		return
+	}
 
-	// Start the server
-	port := "8080"
-	log.Printf("Starting server on port %s...\n", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	// Handle 404
+	http.NotFound(w, r)
 }
 
 func prepareResults(cfg *crawler.Config) []PageResult {
@@ -253,14 +252,6 @@ func prepareResults(cfg *crawler.Config) []PageResult {
 
 		results = append(results, result)
 	}
-
-	// Sort by count, then URL
-	sort.Slice(results, func(i, j int) bool {
-		if results[i].Count != results[j].Count {
-			return results[i].Count > results[j].Count
-		}
-		return results[i].URL < results[j].URL
-	})
 
 	return results
 }
