@@ -1,12 +1,12 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/csv"
 	"fmt"
 	"html/template"
+	"io"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strconv"
 	"time"
 
@@ -46,21 +46,17 @@ type DownloadData struct {
 	URL string
 }
 
+var (
+	indexTemplate    = template.Must(template.New("index").Parse(indexHTML))
+	resultsTemplate  = template.Must(template.New("results").Parse(resultsHTML))
+	downloadTemplate = template.Must(template.New("download").Parse(downloadHTML))
+)
+
 // Handler is the main HTTP handler for the application
 func Handler(w http.ResponseWriter, r *http.Request) {
-	// Set up templates
-	templates := template.Must(template.ParseGlob("web/templates/*.html"))
-
-	// Serve static files
-	if r.URL.Path == "/static/" {
-		fs := http.FileServer(http.Dir("web/static"))
-		fs.ServeHTTP(w, r)
-		return
-	}
-
 	// Home page
 	if r.URL.Path == "/" {
-		err := templates.ExecuteTemplate(w, "index.html", nil)
+		err := indexTemplate.Execute(w, nil)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
@@ -91,7 +87,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		// Configure and run crawler
 		cfg, err := crawler.NewConfig(url, concurrency, maxPages)
 		if err != nil {
-			renderResults(w, templates, ResultsData{
+			renderResults(w, ResultsData{
 				Error: fmt.Sprintf("Failed to configure crawler: %v", err),
 			})
 			return
@@ -105,7 +101,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		// Prepare results
 		results := prepareResults(cfg)
 
-		renderResults(w, templates, ResultsData{
+		renderResults(w, ResultsData{
 			BaseURL:     url,
 			Concurrency: concurrency,
 			MaxPages:    maxPages,
@@ -143,23 +139,9 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		go cfg.CrawlPage(url)
 		cfg.Wg.Wait()
 
-		// Create CSV file
-		timestamp := time.Now().Format("20060102-150405")
-		filename := fmt.Sprintf("seo_crawl_%s.csv", timestamp)
-		csvPath := filepath.Join("web/static/downloads", filename)
-
-		// Ensure directory exists
-		os.MkdirAll(filepath.Dir(csvPath), 0755)
-
-		file, err := os.Create(csvPath)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Failed to create CSV file: %v", err), http.StatusInternalServerError)
-			return
-		}
-		defer file.Close()
-
-		writer := csv.NewWriter(file)
-		defer writer.Flush()
+		// Create CSV in memory
+		var buf bytes.Buffer
+		writer := csv.NewWriter(&buf)
 
 		// Write header
 		headers := []string{
@@ -212,11 +194,20 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		// Return download link
-		downloadURL := fmt.Sprintf("/static/downloads/%s", filename)
-		err = templates.ExecuteTemplate(w, "download.html", DownloadData{URL: downloadURL})
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		writer.Flush()
+		if err := writer.Error(); err != nil {
+			http.Error(w, fmt.Sprintf("Failed to write CSV: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		// Set headers for CSV download
+		w.Header().Set("Content-Type", "text/csv")
+		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;filename=seo_crawl_%s.csv", time.Now().Format("20060102-150405")))
+
+		// Write CSV to response
+		if _, err := io.Copy(w, &buf); err != nil {
+			http.Error(w, fmt.Sprintf("Failed to send CSV: %v", err), http.StatusInternalServerError)
+			return
 		}
 		return
 	}
@@ -256,9 +247,181 @@ func prepareResults(cfg *crawler.Config) []PageResult {
 	return results
 }
 
-func renderResults(w http.ResponseWriter, tmpl *template.Template, data ResultsData) {
-	err := tmpl.ExecuteTemplate(w, "results.html", data)
+func renderResults(w http.ResponseWriter, data ResultsData) {
+	err := resultsTemplate.Execute(w, data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
+// Embedded HTML templates
+const indexHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Crawler</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Web Crawler</h1>
+        <div class="crawler-form">
+            <form hx-post="/crawl" hx-target="#results" hx-indicator=".spinner-container">
+                <div class="form-group">
+                    <input type="url" name="url" placeholder="Enter URL to crawl" required>
+                </div>
+                <div class="form-group controls">
+                    <div>
+                        <input type="number" name="concurrency" placeholder="Concurrency (default: 5)" min="1" max="20">
+                    </div>
+                    <div>
+                        <input type="number" name="pages" placeholder="Max Pages (default: 50)" min="1" max="1000">
+                    </div>
+                </div>
+                <button type="submit">Start Crawling</button>
+            </form>
+        </div>
+        <div class="spinner-container htmx-indicator">
+            <div class="spinner"></div>
+            <p>Crawling in progress...</p>
+        </div>
+        <div id="results"></div>
+    </div>
+</body>
+</html>`
+
+const resultsHTML = `{{if .Error}}
+    <div class="error">
+        <p>Error: {{.Error}}</p>
+    </div>
+{{else}}
+    <div class="crawl-info">
+        <h2>Crawl Results for {{.BaseURL}}</h2>
+        <p class="page-count">Found {{.PageCount}} unique pages</p>
+    </div>
+    
+    {{if eq .PageCount 0}}
+        <div class="empty-results">
+            <p>No pages found.</p>
+        </div>
+    {{else}}
+        <div class="results-tabs">
+            <button class="tab-btn active" data-tab="basic">Basic</button>
+            <button class="tab-btn" data-tab="seo">SEO Details</button>
+        </div>
+
+        <div id="basic-tab" class="tab-content active">
+            <table>
+                <thead>
+                    <tr>
+                        <th>URL</th>
+                        <th>Links</th>
+                        <th>Status</th>
+                        <th>Title</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Results}}
+                    <tr>
+                        <td>{{.URL}}</td>
+                        <td>{{.Count}}</td>
+                        <td>{{.StatusCode}}</td>
+                        <td>{{.Title}}</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="seo-tab" class="tab-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>URL</th>
+                        <th>Words</th>
+                        <th>Int. Links</th>
+                        <th>Ext. Links</th>
+                        <th>Images</th>
+                        <th>H1</th>
+                        <th>Meta</th>
+                        <th>Canonical</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Results}}
+                    <tr>
+                        <td>{{.URL}}</td>
+                        <td>{{.WordCount}}</td>
+                        <td>{{.InternalLinks}}</td>
+                        <td>{{.ExternalLinks}}</td>
+                        <td>{{.ImagesCount}}</td>
+                        <td class="{{if .HasH1}}good{{else}}bad{{end}}">{{.H1Count}}</td>
+                        <td class="{{if .HasMeta}}good{{else}}bad{{end}}">{{if .HasMeta}}Yes{{else}}No{{end}}</td>
+                        <td class="{{if .HasCanonical}}good{{else}}bad{{end}}">
+                            {{if .HasCanonical}}
+                                <span title="{{.CanonicalURL}}">Yes</span>
+                            {{else}}
+                                No
+                            {{end}}
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="actions">
+            <a href="/export-csv?url={{.BaseURL}}&concurrency={{.Concurrency}}&pages={{.MaxPages}}" class="button">
+                Export SEO Data as CSV
+            </a>
+        </div>
+    {{end}}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.getAttribute('data-tab');
+                    
+                    // Hide all content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Remove active class from all buttons
+                    tabBtns.forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Show selected content and mark button as active
+                    document.getElementById(tabId + '-tab').classList.add('active');
+                    btn.classList.add('active');
+                });
+            });
+        });
+    </script>
+{{end}}`
+
+const downloadHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Complete</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Download Complete</h1>
+        <div class="download-info">
+            <p>Your CSV file has been generated and should start downloading automatically.</p>
+            <p>If the download doesn't start automatically, <a href="{{.URL}}">click here</a>.</p>
+        </div>
+    </div>
+</body>
+</html>`

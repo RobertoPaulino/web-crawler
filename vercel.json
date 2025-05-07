@@ -4,6 +4,10 @@
     {
       "src": "cmd/web/main.go",
       "use": "@vercel/go"
+    },
+    {
+      "src": "static/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
